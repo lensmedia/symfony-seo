@@ -2,7 +2,7 @@
 Some simple reusable SEO tools for Symfony projects.
 
 ## Meta
-### Attribute to add meta information
+### Attribute 
 ```php
 use Lens\Bundle\SeoBundle\Attribute\Meta;
 
@@ -21,7 +21,8 @@ class Index extends AbstractController
 }
 ```
 
-### The `Twig/MetaExtension` adds a global variable `lens_seo_meta` (can be changed, see config) to the twig context that can then be used
+### Using in twig
+The `Twig/MetaExtension` adds a global variable `lens_seo_meta` (can be changed, see config) to the twig context that can then be used
 ```html
 <title>{{ title ?? lens_seo_meta.title ?? 'meta.title'|trans }}</title>
 
@@ -37,7 +38,8 @@ class Index extends AbstractController
 {% endif %}
 ```
 
-### Resolver allows for full control over the meta tags, mainly useful for dynamic routes.
+### Meta resolver
+A meta resolver allows for full control over the meta tags, mainly useful for dynamic routes.
 ```php
 #[Route(name: 'faq')]
 #[Meta(resolver: FaqResolver::class)]
@@ -98,7 +100,8 @@ class Faq extends AbstractController
 }
 ```
 
-### The `Twig/BreadcrumbExtension` adds a global variable `lens_seo_breadcrumbs` (can be changed, see config) to the twig context that can then be used
+### Using in twig
+The `Twig/BreadcrumbExtension` adds a global variable `lens_seo_breadcrumbs` (can be changed, see config) to the twig context that can then be used
 
 ```html
 {% if lens_seo_breadcrumbs is defined and lens_seo_breadcrumbs is not empty %}
@@ -119,7 +122,8 @@ class Faq extends AbstractController
 ```
 _Example was made for bootstrap 5_
 
-### Resolver allows for full control over the breadcrumbs
+### Breadcrumb resolver
+A breadcrumb resolver allows for full control over the breadcrumbs when they have dynamic values.
 ```php
 #[Route(name: 'faq')]
 #[Meta(resolver: FaqResolver::class)]
@@ -152,11 +156,8 @@ Provides classes to help with setting up structured data using [spatie/schema-or
 ```php
 <?php
 
+use Spatie\SchemaOrg\Schema;
 use Lens\Bundle\SeoBundle\StructuredData\StructuredDataBuilder;
-
-use Symfony\Component\Routing\Attribute\Route;
-
-...
 
 class Index extends AbstractController
 {
@@ -227,7 +228,7 @@ class Index extends AbstractController
 }
 ```
 
-_The invokable method will automatically be called._
+_The invokable method will be called automatically (but it doesnt matter if you do)._
 
 ### Adding the structured data to the response 
 The `Event/AppendStructuredDataToResponse` listener will automatically append the structured data to 
