@@ -8,7 +8,10 @@ use Lens\Bundle\SeoBundle\Attribute\Meta;
 
 class Index extends AbstractController
 {
-    #[Route(name: 'homepage')]
+    #[Route([
+        'nl' => null,
+        'en' => '/en',
+    ], name: 'homepage')]
     #[Meta('nl', 'Hoi wereld!', keywords: ['lens', 'zmo', 'bundel'])]
     #[Meta('en', 'Hello world!', keywords: ['lens', 'seo', 'bundle'])]
     public function __invoke(): Response
