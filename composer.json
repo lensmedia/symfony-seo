@@ -1,0 +1,18 @@
+{
+    "name": "lensmedia/symfony-seo",
+    "description": "\"Private\" bundle for some reusable seo stuff.",
+    "license": "proprietary",
+    "type": "symfony-bundle",
+    "require": {
+        "php": ">=8.2",
+        "spatie/schema-org": "^3.23",
+        "symfony/framework-bundle": "^7.0",
+        "symfony/translation": "^7.0",
+        "symfony/twig-bundle": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lens\\Bundle\\SeoBundle\\": "src/"
+        }
+    }
+}
