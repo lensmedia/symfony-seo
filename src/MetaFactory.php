@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Throwable;
 
 class MetaFactory
 {
@@ -64,11 +65,9 @@ class MetaFactory
                 $this->cache->save($cacheItem);
             }
 
+            // If null or a resolver we can not cache its result.
             $meta = $cacheItem->get();
-
-            // If we do have a resolver we have to do it after the cache
-            // as its dynamic.
-            if (!$meta->resolver) {
+            if (!$meta || !$meta->resolver) {
                 return $meta;
             }
 
@@ -78,7 +77,7 @@ class MetaFactory
         return self::$cached[$index];
     }
 
-    private function fallback(): Meta
+    private function fallback(): ?Meta
     {
         if ($this->isDebug) {
             $this->logger->warning(sprintf(
@@ -91,12 +90,7 @@ class MetaFactory
             return $this->fallbackMetaService->fallback($this->request());
         }
 
-        return new Meta(
-            locale: $this->request()?->getLocale(),
-            title: 'meta.title',
-            description: 'meta.description',
-            translate: true,
-        );
+        return null;
     }
 
     private function request(): ?Request
@@ -104,7 +98,7 @@ class MetaFactory
         return $this->requestStack->getCurrentRequest();
     }
 
-    private function meta(): Meta
+    private function meta(): ?Meta
     {
         // Track both current locale meta and default (no locale) meta.
         $localeMeta = null;
@@ -128,10 +122,13 @@ class MetaFactory
         }
 
         $meta = $localeMeta ?? $defaultMeta ?? $this->fallback();
+        if (!$meta) {
+            return null;
+        }
+
         $meta->locale = $locale;
 
-        // If meta is not a resolver we are allowed to cache the
-        // translation.
+        // If meta is not a resolver we are allowed to do and cache the translations right now.
         if (!$meta->resolver && $meta->hasTranslatableOptions()) {
             $meta = $this->translate($meta);
         }
@@ -139,7 +136,7 @@ class MetaFactory
         return $meta;
     }
 
-    private function resolve(Meta $meta): Meta
+    private function resolve(Meta $meta): ?Meta
     {
         if (empty($this->resolvers[$meta->resolver])) {
             throw new RuntimeException(sprintf(
@@ -150,9 +147,25 @@ class MetaFactory
         }
 
         $resolver = $this->resolvers[$meta->resolver];
-        $resolver->resolveMeta($this->request(), $meta);
 
-        return $meta;
+        try {
+            $resolver->resolveMeta($this->request(), $meta);
+
+            return $meta;
+        } catch (Throwable $error) {
+            if ($this->isDebug) {
+                $errorMessage = sprintf('MetaResolver "%s" threw an error. If this is intended (to not resolve a Meta value) you can ignore this message.', $meta->resolver)
+                    .PHP_EOL
+                    .PHP_EOL
+                    .$error->getMessage();
+
+                $this->logger->warning($errorMessage, [
+                    'exception' => $error
+                ]);
+            }
+        }
+
+        return null;
     }
 
     private function translate(Meta $meta): Meta

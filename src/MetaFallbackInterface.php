@@ -7,5 +7,5 @@ use Symfony\Component\HttpFoundation\Request;
 
 interface MetaFallbackInterface
 {
-    public function fallback(Request $request): Meta;
+    public function fallback(Request $request): ?Meta;
 }
