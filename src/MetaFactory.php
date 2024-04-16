@@ -24,6 +24,7 @@ class MetaFactory
         private readonly RouteCollectionHelper $routeCollectionHelper,
         private readonly RequestStack $requestStack,
         iterable $resolvers,
+        private readonly ?MetaFallbackInterface $fallbackMetaService = null,
         private readonly bool $isDebug = false,
     ) {
         foreach ($resolvers as $resolver) {
@@ -84,6 +85,10 @@ class MetaFactory
                 'The route "%s" has no associated meta information, using fallback.',
                 $this->request()?->get('_route', $this->request()?->getPathInfo()),
             ));
+        }
+
+        if ($this->fallbackMetaService instanceof MetaFallbackInterface) {
+            return $this->fallbackMetaService->fallback($this->request());
         }
 
         return new Meta(

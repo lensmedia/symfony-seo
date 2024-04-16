@@ -34,6 +34,7 @@ return static function (ContainerConfigurator $container) {
             service(RouteCollectionHelper::class),
             service(RequestStack::class),
             tagged_iterator(MetaResolverInterface::SERVICE_TAG),
+            null,
             param('kernel.debug'),
         ])
 

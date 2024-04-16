@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Lens\Bundle\SeoBundle\DependencyInjection;
 
 use Lens\Bundle\SeoBundle\BreadcrumbResolverInterface;
+use Lens\Bundle\SeoBundle\MetaFactory;
 use Lens\Bundle\SeoBundle\MetaResolverInterface;
 use Lens\Bundle\SeoBundle\StructuredData\StructuredDataResolverInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class LensSeoExtension extends Extension
@@ -35,5 +37,11 @@ class LensSeoExtension extends Extension
         $container->registerForAutoconfiguration(MetaResolverInterface::class)->addTag(MetaResolverInterface::SERVICE_TAG);
         $container->registerForAutoconfiguration(BreadcrumbResolverInterface::class)->addTag(BreadcrumbResolverInterface::SERVICE_TAG);
         $container->registerForAutoconfiguration(StructuredDataResolverInterface::class)->addTag(StructuredDataResolverInterface::SERVICE_TAG);
+
+        $fallbackMetaService = $config['fallback_meta_service'];
+        if ($fallbackMetaService) {
+            $metaFactory = $container->getDefinition(MetaFactory::class);
+            $metaFactory->setArgument('$fallbackMetaService', new Reference($fallbackMetaService));
+        }
     }
 }

@@ -18,6 +18,7 @@ readonly class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->getRootNode();
         $rootNode
             ->children()
+                ->scalarNode('fallback_meta_service')->defaultNull()->end()
             ->end();
 
         $this->addStructuredDataSection($rootNode);
