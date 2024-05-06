@@ -6,5 +6,5 @@ use Spatie\SchemaOrg\Type;
 
 interface StructuredDataInterface
 {
-    public function __invoke(): ?Type;
+    public function __invoke(array $context = []): ?Type;
 }
