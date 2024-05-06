@@ -105,22 +105,19 @@ The `Twig/BreadcrumbExtension` adds a global variable `lens_seo_breadcrumbs` (ca
 
 ```html
 {% if lens_seo_breadcrumbs is defined and lens_seo_breadcrumbs is not empty %}
-    <div class="container py-2 small fst-italic">
-        <ol class="breadcrumb opacity-75">
-            {% for breadcrumb in lens_seo_breadcrumbs %}
-                {% if loop.last %}
-                    <li class="breadcrumb-item active">{{ breadcrumb.title }}</li>
-                {% else %}
-                    <li class="breadcrumb-item">
-                        <a href="{{ path(breadcrumb.routeName, breadcrumb.routeParameters) }}">{{ breadcrumb.title }}</a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-        </ol>
-    </div>
+    <ol class="breadcrumbs">
+        {% for breadcrumb in lens_seo_breadcrumbs %}
+            {% if loop.last %}
+                <li class="breadcrumb-item active">{{ breadcrumb.title }}</li>
+            {% else %}
+                <li class="breadcrumb-item">
+                    <a href="{{ path(breadcrumb.routeName, breadcrumb.routeParameters) }}">{{ breadcrumb.title }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ol>
 {% endif %}
 ```
-_Example was made for bootstrap 5_
 
 ### Breadcrumb resolver
 A breadcrumb resolver allows for full control over the breadcrumbs when they have dynamic values.
