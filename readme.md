@@ -32,8 +32,8 @@ The `Twig/MetaExtension` adds a global variable `lens_seo_meta` (can be changed,
 {% if lens_seo_meta is defined and lens_seo_meta is not empty %}
     <meta name="title" content="{{ title }}">
     <meta name="description" content="{{ description }}">
-    {% if keywords ?? lens_seo_meta.keywords|length %}
-        <meta name="keywords" content="{{ (keywords ?? meta.keywords)|join(', ') }}">
+    {% if (keywords ?? lens_seo_meta.keywords)|length %}
+        <meta name="keywords" content="{{ (keywords ?? lens_seo_meta.keywords)|join(', ') }}">
     {% endif %}
 {% endif %}
 ```
