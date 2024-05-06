@@ -192,7 +192,7 @@ class Organization implements StructuredDataInterface
     ) {
     }
 
-    public function __invoke(): \Spatie\SchemaOrg\Organization
+    public function __invoke(array $context = []): \Spatie\SchemaOrg\Organization
     {
         $url = rtrim($this->urlGenerator->generate('web_common_index', [], UrlGeneratorInterface::ABSOLUTE_URL), '/');
 
