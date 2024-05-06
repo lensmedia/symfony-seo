@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 interface MetaResolverInterface
 {
-    public const SERVICE_TAG = 'lens_seo.meta.resolver';
+    public const META_RESOLVER_SERVICE_TAG = 'lens_seo.meta.resolver';
 
     public function resolveMeta(Request $request, Meta $meta): void;
 }

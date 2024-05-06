@@ -34,9 +34,9 @@ class LensSeoExtension extends Extension
         $loader = new PhpFileLoader($container, new FileLocator(dirname(__DIR__).'/Resources/config'));
         $loader->load('services.php');
 
-        $container->registerForAutoconfiguration(MetaResolverInterface::class)->addTag(MetaResolverInterface::SERVICE_TAG);
-        $container->registerForAutoconfiguration(BreadcrumbResolverInterface::class)->addTag(BreadcrumbResolverInterface::SERVICE_TAG);
-        $container->registerForAutoconfiguration(StructuredDataResolverInterface::class)->addTag(StructuredDataResolverInterface::SERVICE_TAG);
+        $container->registerForAutoconfiguration(MetaResolverInterface::class)->addTag(MetaResolverInterface::META_RESOLVER_SERVICE_TAG);
+        $container->registerForAutoconfiguration(BreadcrumbResolverInterface::class)->addTag(BreadcrumbResolverInterface::BREADCRUMB_RESOLVER_SERVICE_TAG);
+        $container->registerForAutoconfiguration(StructuredDataResolverInterface::class)->addTag(StructuredDataResolverInterface::STRUCTURED_DATA_SERVICE_TAG);
 
         $fallbackMetaService = $config['fallback_meta_service'];
         if ($fallbackMetaService) {

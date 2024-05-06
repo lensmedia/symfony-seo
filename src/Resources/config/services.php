@@ -33,7 +33,7 @@ return static function (ContainerConfigurator $container) {
             service(TranslatorInterface::class),
             service(RouteCollectionHelper::class),
             service(RequestStack::class),
-            tagged_iterator(MetaResolverInterface::SERVICE_TAG),
+            tagged_iterator(MetaResolverInterface::META_RESOLVER_SERVICE_TAG),
             null,
             param('kernel.debug'),
         ])
@@ -51,14 +51,14 @@ return static function (ContainerConfigurator $container) {
             service(CacheInterface::class),
             service(TranslatorInterface::class),
             service(RequestStack::class),
-            tagged_iterator(BreadcrumbResolverInterface::SERVICE_TAG),
+            tagged_iterator(BreadcrumbResolverInterface::BREADCRUMB_RESOLVER_SERVICE_TAG),
             param('kernel.debug'),
         ])
 
         // StructuredData
         ->set(StructuredDataBuilder::class)
         ->args([
-            tagged_iterator(StructuredDataResolverInterface::SERVICE_TAG),
+            tagged_iterator(StructuredDataResolverInterface::STRUCTURED_DATA_SERVICE_TAG),
             param('lens_seo.structured_data.json_encode_options'),
         ])
 
