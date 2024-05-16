@@ -7,7 +7,6 @@ use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
-use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function is_array;
@@ -21,11 +20,9 @@ class BreadcrumbFactory
 
     public function __construct(
         private readonly RouteCollectionHelper $routeCollectionHelper,
-        private readonly CacheInterface $cache,
         private readonly TranslatorInterface $translator,
         private readonly RequestStack $requestStack,
         iterable $resolvers,
-        private readonly bool $isDebug = false,
     ) {
         foreach ($resolvers as $resolver) {
             if (!$resolver instanceof BreadcrumbResolverInterface) {
@@ -42,12 +39,12 @@ class BreadcrumbFactory
 
     public function get(?Request $request = null): array
     {
-        $request ??= $this->requestStack->getCurrentRequest();
+        $request ??= $this->requestStack->getMainRequest();
         if (!$request) {
             throw new RuntimeException('Breadcrumbs only work when in request context.');
         }
 
-        $routeName = $request->get('_route');
+        $routeName = $request->attributes->get('_route');
         if (!$routeName || str_starts_with($routeName, '_')) {
             return [];
         }
@@ -55,13 +52,14 @@ class BreadcrumbFactory
         $index = spl_object_hash($request);
         if (!isset(self::$cached[$index])) {
             $breadcrumbs = [];
+
             do {
                 $route = $this->routeCollectionHelper->route($routeName, $request->getLocale());
                 if (!$route) {
                     break;
                 }
 
-                $breadcrumb = $this->breadcrumb($request, $routeName, $route, $request->getLocale(), $breadcrumbs);
+                $breadcrumb = $this->breadcrumbFromRoute($request, $routeName, $route, $breadcrumbs);
                 if (!$breadcrumb) {
                     break;
                 }
@@ -73,60 +71,53 @@ class BreadcrumbFactory
         return self::$cached[$index];
     }
 
-    private function breadcrumb(Request $request, string $canonicalRoute, Route $route, string $currentLocale, array &$breadcrumbs = []): ?Breadcrumb
+    private function breadcrumbFromRoute(Request $request, string $canonicalRoute, Route $route, array &$breadcrumbs = []): ?Breadcrumb
     {
-        $cacheIndex = 'lens_seo.breadcrumb.'.$canonicalRoute.'.'.$currentLocale;
-        if ($this->isDebug) {
-            $this->cache->delete($cacheIndex);
+        $locale = $request->getLocale();
+
+        $breadcrumb = $this->breadcrumbAttributeFromRoute($route);
+        if (!$breadcrumb) {
+            return null;
         }
 
-        /** @var ?Breadcrumb $breadcrumb */
-        $breadcrumb = $this->cache->get($cacheIndex, function () use ($request, $route, $canonicalRoute, $currentLocale) {
-            $breadcrumbs = $this->routeCollectionHelper->attributesFromRoute($route, Breadcrumb::class);
-            if (empty($breadcrumbs)) {
-                return null;
-            }
+        $breadcrumb->routeName = $canonicalRoute;
+        $breadcrumb->routeParameters = array_intersect_key(
+            $request->attributes->get('_route_params', []),
+            array_flip($route->compile()?->getPathVariables() ?? []),
+        );
 
-            /** @var Breadcrumb $breadcrumb */
-            $breadcrumb = $breadcrumbs[0];
-            $breadcrumb->routeName = $canonicalRoute;
-            $breadcrumb->routeParameters = array_intersect_key(
-                $request->attributes->get('_route_params', []),
-                array_flip($route->compile()?->getPathVariables() ?? []),
-            );
+        $breadcrumb->routeParameters['_locale'] = $locale;
 
-            $breadcrumb->routeParameters['_locale'] = $currentLocale;
-
-            // We can only resolve and cache the result when it's not a resolver as they tend to be dynamic.
-            if (!$breadcrumb->resolver) {
-                if (is_array($breadcrumb->title)) {
-                    $breadcrumb->title = $breadcrumb->title[$currentLocale];
-                }
-
-                if ($breadcrumb->translate) {
-                    $breadcrumb->title = $this->translator->trans(
-                        $breadcrumb->title,
-                        $breadcrumb->context,
-                        $breadcrumb->translationDomain,
-                        locale: $currentLocale
-                    );
-                }
-            }
-
-            return $breadcrumb;
-        });
-
-        // Resolvers should append their own crumbs.
-        if ($breadcrumb?->resolver) {
-            $this->resolve($request, $breadcrumb, $breadcrumbs);
+        if ($breadcrumb->resolver) {
+            $this->executeResolver($request, $breadcrumb, $breadcrumbs);
         } else {
+            if (is_array($breadcrumb->title)) {
+                $breadcrumb->title = $breadcrumb->title[$locale];
+            }
+
+            if ($breadcrumb->translate) {
+                $breadcrumb->title = $this->translator->trans(
+                    $breadcrumb->title,
+                    $breadcrumb->context,
+                    $breadcrumb->translationDomain,
+                    locale: $locale
+                );
+            }
+
             $breadcrumbs[] = $breadcrumb;
         }
 
         return $breadcrumb;
     }
 
-    private function resolve(Request $request, Breadcrumb $breadcrumb, array &$breadcrumbs): void
+    private function breadcrumbAttributeFromRoute(Route $route): ?Breadcrumb
+    {
+        $breadcrumbs = $this->routeCollectionHelper->attributesFromRoute($route, Breadcrumb::class);
+
+        return $breadcrumbs[0] ?? null;
+    }
+
+    private function executeResolver(Request $request, Breadcrumb $breadcrumb, array &$breadcrumbs): void
     {
         if (empty($this->resolvers[$breadcrumb->resolver])) {
             throw new RuntimeException(sprintf(

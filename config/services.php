@@ -19,6 +19,7 @@ use Lens\Bundle\SeoBundle\Twig\MetaExtension;
 use Lens\Bundle\SeoBundle\Twig\StructuredDataExtension;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Controller\TraceableControllerResolver;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -49,11 +50,9 @@ return static function (ContainerConfigurator $container) {
         ->set(BreadcrumbFactory::class)
         ->args([
             service(RouteCollectionHelper::class),
-            service(CacheInterface::class),
             service(TranslatorInterface::class),
             service(RequestStack::class),
             tagged_iterator(BreadcrumbResolverInterface::BREADCRUMB_RESOLVER_SERVICE_TAG),
-            param('kernel.debug'),
         ])
 
         // StructuredData
@@ -66,9 +65,9 @@ return static function (ContainerConfigurator $container) {
         // RouteCollectionHelper
         ->set(RouteCollectionHelper::class)
         ->args([
-            service(KernelInterface::class),
             service(CacheInterface::class),
             service(RouterInterface::class),
+            param('kernel.debug'),
         ])
 
         ->set(AppendStructuredDataToResponse::class)
