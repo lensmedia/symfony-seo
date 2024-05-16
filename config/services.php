@@ -6,6 +6,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Lens\Bundle\SeoBundle\BreadcrumbFactory;
 use Lens\Bundle\SeoBundle\BreadcrumbResolverInterface;
+use Lens\Bundle\SeoBundle\DataCollector\SeoDataCollector;
 use Lens\Bundle\SeoBundle\Event\AppendStructuredDataToResponse;
 use Lens\Bundle\SeoBundle\MetaCacheWarmer;
 use Lens\Bundle\SeoBundle\MetaFactory;
@@ -76,6 +77,7 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('kernel.event_listener', [
             'event' => 'kernel.response',
+            'priority' => -8192,
         ])
 
         // Twig extensions (adds globals)
@@ -85,8 +87,8 @@ return static function (ContainerConfigurator $container) {
             param('lens_seo.twig.globals.meta.enabled'),
             param('lens_seo.twig.globals.meta.name'),
         ])
-
         ->tag('twig.extension')
+
         ->set(BreadcrumbExtension::class)
         ->args([
             service(BreadcrumbFactory::class),
@@ -102,5 +104,17 @@ return static function (ContainerConfigurator $container) {
             param('lens_seo.twig.globals.structured_data.name'),
         ])
         ->tag('twig.extension')
+
+        ->set(SeoDataCollector::class)
+        ->args([
+            service(MetaFactory::class),
+            service(BreadcrumbFactory::class),
+            service(StructuredDataBuilder::class),
+        ])
+        ->tag('data_collector', [
+            'id' => 'lens_seo',
+            'template' => '@LensSeo/data_collector.html.twig',
+            'priority' => 0,
+        ])
     ;
 };

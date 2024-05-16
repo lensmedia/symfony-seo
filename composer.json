@@ -14,5 +14,8 @@
         "psr-4": {
             "Lens\\Bundle\\SeoBundle\\": "src/"
         }
+    },
+    "require-dev": {
+        "symfony/profiler-pack": "^1.0"
     }
 }
