@@ -28,7 +28,7 @@
         <div class="sf-toolbar-info-piece">
             <span class="sf-toolbar-header">
                 Meta
-                {% if not meta %}<span style="color:red;">✗</span>{% endif %}
+                {% if not meta %}<span style="color:red;">✗</span>{% endif %}7
             </span>
         </div>
 
@@ -78,5 +78,11 @@
     {% set breadcrumbs = collector.breadcrumbs %}
     {% set structuredData = collector.structuredData %}
 
+    {% for data in structuredData['@graph'] %}
+        <details>
+            <summary>{{ data['@type'] ?? 'Invalid Entry' }}</summary>
+            <pre>{{ data|json_encode(constant('JSON_PRETTY_PRINT') + constant('JSON_UNESCAPED_SLASHES')) }}</pre>
+        </details>
+    {% endfor %}
     {{ dump(meta, breadcrumbs, structuredData) }}
 {% endblock %}

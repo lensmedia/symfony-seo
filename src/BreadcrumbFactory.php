@@ -31,7 +31,7 @@ class BreadcrumbFactory
             if (!$resolver instanceof BreadcrumbResolverInterface) {
                 throw new RuntimeException(sprintf(
                     'Breadcrumb resolver "%s" must implement "%s".',
-                    get_class($resolver),
+                    $resolver::class,
                     BreadcrumbResolverInterface::class,
                 ));
             }
@@ -61,11 +61,11 @@ class BreadcrumbFactory
                     break;
                 }
 
-                $breadCrumb = $this->breadcrumb($request, $routeName, $route, $request->getLocale(), $breadcrumbs);
-                if (!$breadCrumb) {
+                $breadcrumb = $this->breadcrumb($request, $routeName, $route, $request->getLocale(), $breadcrumbs);
+                if (!$breadcrumb) {
                     break;
                 }
-            } while ($routeName = $breadCrumb->parent);
+            } while ($routeName = $breadcrumb->parent);
 
             self::$cached[$index] = $breadcrumbs;
         }
@@ -116,8 +116,11 @@ class BreadcrumbFactory
             return $breadcrumb;
         });
 
+        // Resolvers should append their own crumbs.
         if ($breadcrumb?->resolver) {
             $this->resolve($request, $breadcrumb, $breadcrumbs);
+        } else {
+            $breadcrumbs[] = $breadcrumb;
         }
 
         return $breadcrumb;
