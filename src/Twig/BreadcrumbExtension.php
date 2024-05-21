@@ -22,7 +22,7 @@ final class BreadcrumbExtension extends AbstractExtension implements GlobalsInte
         }
 
         return [
-            $this->globalName => $this->breadcrumbFactory->get(),
+            $this->globalName => $this->breadcrumbFactory->get(...),
         ];
     }
 }
