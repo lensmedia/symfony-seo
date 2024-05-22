@@ -41,7 +41,7 @@ class BreadcrumbFactory
     {
         $request ??= $this->requestStack->getMainRequest();
         if (!$request) {
-            throw new RuntimeException('Breadcrumbs only work when in request context.');
+            return [];
         }
 
         $routeName = $request->attributes->get('_route');
