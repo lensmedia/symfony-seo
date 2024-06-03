@@ -19,8 +19,6 @@ use Lens\Bundle\SeoBundle\Twig\MetaExtension;
 use Lens\Bundle\SeoBundle\Twig\StructuredDataExtension;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Controller\TraceableControllerResolver;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;

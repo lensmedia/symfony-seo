@@ -65,7 +65,7 @@ class BreadcrumbFactory
                 }
             } while ($routeName = $breadcrumb->parent);
 
-            self::$cached[$index] = $breadcrumbs;
+            self::$cached[$index] = array_reverse($breadcrumbs);
         }
 
         return self::$cached[$index];
