@@ -13,6 +13,8 @@ use Throwable;
 
 class MetaFactory
 {
+    use SupportsRequestTrait;
+
     private static array $cached = [];
 
     /** @var MetaResolverInterface[] */
@@ -26,6 +28,7 @@ class MetaFactory
         private readonly RequestStack $requestStack,
         iterable $resolvers,
         private readonly ?MetaFallbackInterface $fallbackMetaService = null,
+        private readonly array $urls = [],
         private readonly bool $isDebug = false,
     ) {
         foreach ($resolvers as $resolver) {
@@ -43,11 +46,8 @@ class MetaFactory
 
     public function get(): ?Meta
     {
-        if (!$this->request()) {
-            return null;
-        }
-
-        if (str_starts_with($this->request()->get('_route'), '_')) {
+        $request = $this->request();
+        if (!$request || !$this->supportsRequest($request, $this->urls)) {
             return null;
         }
 
@@ -55,8 +55,8 @@ class MetaFactory
         if (!isset(self::$cached[$index])) {
             $cacheItem = $this->cache->getItem(sprintf(
                 'app.meta.%s.%s',
-                $this->request()->get('_route'),
-                $this->request()->getLocale(),
+                $this->request()?->get('_route'),
+                $this->request()?->getLocale(),
             ));
 
             if ($this->isDebug || !$cacheItem->isHit()) {

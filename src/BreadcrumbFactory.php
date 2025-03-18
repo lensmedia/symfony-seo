@@ -13,6 +13,8 @@ use function is_array;
 
 class BreadcrumbFactory
 {
+    use SupportsRequestTrait;
+
     private static array $cached = [];
 
     /** @var BreadcrumbResolverInterface[] */
@@ -23,6 +25,7 @@ class BreadcrumbFactory
         private readonly TranslatorInterface $translator,
         private readonly RequestStack $requestStack,
         iterable $resolvers,
+        private readonly array $urls = [],
     ) {
         foreach ($resolvers as $resolver) {
             if (!$resolver instanceof BreadcrumbResolverInterface) {
@@ -45,7 +48,7 @@ class BreadcrumbFactory
         }
 
         $routeName = $request->attributes->get('_route');
-        if (!$routeName || str_starts_with($routeName, '_')) {
+        if (!$routeName || !$this->supportsRequest($request, $this->urls)) {
             return [];
         }
 

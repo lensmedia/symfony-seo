@@ -35,6 +35,7 @@ return static function (ContainerConfigurator $container) {
             service(RequestStack::class),
             tagged_iterator(MetaResolverInterface::META_RESOLVER_SERVICE_TAG),
             null,
+            param('lens_seo.urls'),
             param('kernel.debug'),
         ])
 
@@ -51,6 +52,7 @@ return static function (ContainerConfigurator $container) {
             service(TranslatorInterface::class),
             service(RequestStack::class),
             tagged_iterator(BreadcrumbResolverInterface::BREADCRUMB_RESOLVER_SERVICE_TAG),
+            param('lens_seo.urls'),
         ])
 
         // StructuredData

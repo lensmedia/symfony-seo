@@ -17,6 +17,21 @@ return static function (DefinitionConfigurator $definition): void {
         ->children()
             ->scalarNode('fallback_meta_service')->defaultNull()->end()
 
+            ->arrayNode('urls')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->arrayNode('include')
+                        ->scalarPrototype()->end()
+                        ->defaultValue([])
+                    ->end()
+
+                    ->arrayNode('exclude')
+                        ->scalarPrototype()->end()
+                        ->defaultValue([])
+                    ->end()
+                ->end()
+            ->end()
+
             ->arrayNode('structured_data')
                 ->addDefaultsIfNotSet()
                 ->children()

@@ -22,16 +22,16 @@ class LensSeoBundle extends AbstractBundle
     {
         $container->import('../config/services.php');
 
-        $container->parameters()->set('lens_seo.structured_data.json_encode_options', $config['structured_data']['json_encode_options']);
+        $container->parameters()
+            ->set('lens_seo.structured_data.json_encode_options', $config['structured_data']['json_encode_options'])
+            ->set('lens_seo.urls', $config['urls']);
 
         // Using container parameter for enabled as $container->removeDefinition does not work?
-        $container->parameters()
-            ->set('lens_seo.twig.globals.meta.enabled', $config['twig']['globals']['meta']['enabled'])
-            ->set('lens_seo.twig.globals.meta.name', $config['twig']['globals']['prefix'].$config['twig']['globals']['meta']['name'])
-            ->set('lens_seo.twig.globals.breadcrumbs.enabled', $config['twig']['globals']['breadcrumbs']['enabled'])
-            ->set('lens_seo.twig.globals.breadcrumbs.name', $config['twig']['globals']['prefix'].$config['twig']['globals']['breadcrumbs']['name'])
-            ->set('lens_seo.twig.globals.structured_data.enabled', $config['twig']['globals']['structured_data']['enabled'])
-            ->set('lens_seo.twig.globals.structured_data.name', $config['twig']['globals']['prefix'].$config['twig']['globals']['structured_data']['name']);
+        foreach (['meta', 'breadcrumbs', 'structured_data'] as $type) {
+            $container->parameters()
+                ->set('lens_seo.twig.globals.'.$type.'.enabled', $config['twig']['globals'][$type]['enabled'])
+                ->set('lens_seo.twig.globals.'.$type.'.name', $config['twig']['globals']['prefix'].$config['twig']['globals'][$type]['name']);
+        }
 
         $builder->registerForAutoconfiguration(MetaResolverInterface::class)->addTag(MetaResolverInterface::META_RESOLVER_SERVICE_TAG);
         $builder->registerForAutoconfiguration(BreadcrumbResolverInterface::class)->addTag(BreadcrumbResolverInterface::BREADCRUMB_RESOLVER_SERVICE_TAG);
