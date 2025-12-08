@@ -21,6 +21,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 return static function (ContainerConfigurator $container) {
@@ -58,6 +59,7 @@ return static function (ContainerConfigurator $container) {
         // StructuredData
         ->set(StructuredDataBuilder::class)
         ->args([
+            service(EventDispatcherInterface::class),
             tagged_iterator(StructuredDataResolverInterface::STRUCTURED_DATA_SERVICE_TAG),
             param('lens_seo.structured_data.json_encode_options'),
         ])
@@ -72,6 +74,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set(AppendStructuredDataToResponse::class)
         ->args([
+            service(EventDispatcherInterface::class),
             service(StructuredDataBuilder::class),
         ])
         ->tag('kernel.event_listener', [

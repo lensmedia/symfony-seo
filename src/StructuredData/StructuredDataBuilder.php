@@ -3,8 +3,10 @@
 namespace Lens\Bundle\SeoBundle\StructuredData;
 
 use JsonSerializable;
+use Lens\Bundle\SeoBundle\Event\StructuredDataResolvedEvent;
 use Spatie\SchemaOrg\Graph;
 use Spatie\SchemaOrg\Type;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_UNICODE;
@@ -22,6 +24,7 @@ class StructuredDataBuilder implements JsonSerializable, Type
     private array $cached = [];
 
     public function __construct(
+        private readonly EventDispatcherInterface $eventDispatcher,
         iterable $structuredDataBuilderResolvers,
         int $jsonEncodeOptions = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
     ) {
@@ -104,6 +107,10 @@ class StructuredDataBuilder implements JsonSerializable, Type
             foreach ($this->structuredDataBuilderResolvers as $resolver) {
                 $schema = $resolver->resolve($graph);
                 if ($schema) {
+                    // Dispatch event to allow modification/addendums of resolved schema.
+                    $event = new StructuredDataResolvedEvent($schema, $resolver);
+                    $this->eventDispatcher->dispatch($event);
+
                     $graph->add($schema, $resolver::class);
                 }
             }
