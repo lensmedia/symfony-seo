@@ -10,7 +10,7 @@ trait SupportsRequestTrait
 {
     private function supportsRequest(Request $request, array $urls = []): bool
     {
-        $route = $request->get('_route');
+        $route = $request->attributes->get('_route');
         if (null === $route || str_starts_with($route, '_')) {
             return false;
         }

@@ -4,11 +4,11 @@
     "license": "proprietary",
     "type": "symfony-bundle",
     "require": {
-        "php": ">=8.2",
-        "spatie/schema-org": "^3.23",
-        "symfony/framework-bundle": "^7.0",
-        "symfony/translation": "^7.0",
-        "symfony/twig-bundle": "^7.0"
+        "php": ">=8.4",
+        "spatie/schema-org": "^3.23.1",
+        "symfony/framework-bundle": "*",
+        "symfony/translation": "*",
+        "symfony/twig-bundle": "*"
     },
     "autoload": {
         "psr-4": {
@@ -16,6 +16,6 @@
         }
     },
     "require-dev": {
-        "symfony/profiler-pack": "^1.0"
+        "symfony/profiler-pack": "*"
     }
 }

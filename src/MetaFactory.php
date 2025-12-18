@@ -55,7 +55,7 @@ class MetaFactory
         if (!isset(self::$cached[$index])) {
             $cacheItem = $this->cache->getItem(sprintf(
                 'app.meta.%s.%s',
-                $this->request()?->get('_route'),
+                $this->request()?->attributes->get('_route'),
                 $this->request()?->getLocale(),
             ));
 
@@ -82,7 +82,7 @@ class MetaFactory
         if ($this->isDebug) {
             $this->logger->warning(sprintf(
                 'The route "%s" has no associated meta information, using fallback.',
-                $this->request()?->get('_route', $this->request()?->getPathInfo()),
+                $this->request()?->attributes->get('_route', $this->request()?->getPathInfo()),
             ));
         }
 
