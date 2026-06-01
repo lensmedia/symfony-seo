@@ -71,15 +71,17 @@ readonly class RouteCollectionHelper
         return $this->attributesFromControllerMethod($controller, $attribute);
     }
 
-    public function attributesFromControllerMethod(string $controllerMethod, ?string $attribute = null): array
+    public function attributesFromControllerMethod(string|array $controllerMethod, ?string $attribute = null): array
     {
-        try {
-            $controllerMethod = $this->validateControllerMethodString($controllerMethod);
-        } catch (InvalidArgumentException) {
-            return [];
+        if (is_string($controllerMethod)) {
+            @[$class, $method] = explode('::', $controllerMethod);
+        } else {
+            @[$class, $method] = $controllerMethod;
         }
 
-        [$class, $method] = explode('::', $controllerMethod);
+        if (!$this->isValidControllerClassAndMethod($class, $method)) {
+            return [];
+        }
 
         try {
             $reflectionClass = new ReflectionClass($class);
@@ -94,19 +96,10 @@ readonly class RouteCollectionHelper
         );
     }
 
-    private function validateControllerMethodString(string $controller): string
+    private function isValidControllerClassAndMethod(string $class, ?string $method): bool
     {
-        @[$controller, $method] = explode('::', $controller);
-
         $method ??= '__invoke';
 
-        if (!class_exists($controller) || !method_exists($controller, $method)) {
-            throw new InvalidArgumentException(sprintf(
-                'Controller method "%s" does not exist.',
-                $controller.'::'.$method,
-            ));
-        }
-
-        return $controller.'::'.$method;
+        return class_exists($class) && method_exists($class, $method);
     }
 }
