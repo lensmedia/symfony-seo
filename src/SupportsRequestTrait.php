@@ -22,13 +22,13 @@ trait SupportsRequestTrait
 
         $path = $request->getPathInfo();
 
-        if (!empty($urls['exclude'])) {
-            foreach ($urls['exclude'] as $url) {
-                if (preg_match($url, $path)) {
-                    return false;
-                }
+        foreach ($urls['exclude'] ?? [] as $url) {
+            if (preg_match($url, $path)) {
+                return false;
             }
+        }
 
+        if (empty($urls['include'])) {
             return true;
         }
 

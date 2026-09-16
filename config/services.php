@@ -76,6 +76,7 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service(EventDispatcherInterface::class),
             service(StructuredDataBuilder::class),
+            param('lens_seo.urls'),
         ])
         ->tag('kernel.event_listener', [
             'event' => 'kernel.response',

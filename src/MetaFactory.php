@@ -111,8 +111,8 @@ class MetaFactory
 
         foreach ($metaAttributes as $metaAttribute) {
             if (null === $metaAttribute->locale) {
-                $defaultMeta = $metaAttribute;
-                break;
+                $defaultMeta ??= $metaAttribute;
+                continue;
             }
 
             if ($metaAttribute->locale === $locale) {

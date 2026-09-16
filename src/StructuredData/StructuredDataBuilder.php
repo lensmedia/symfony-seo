@@ -8,6 +8,7 @@ use Spatie\SchemaOrg\Graph;
 use Spatie\SchemaOrg\Type;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+use const JSON_HEX_TAG;
 use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_UNICODE;
 
@@ -124,7 +125,7 @@ class StructuredDataBuilder implements JsonSerializable, Type
 
     public function toScript(): string
     {
-        return '<script type="application/ld+json">'.json_encode($this->toArray(), $this->jsonEncodeOptions).'</script>';
+        return '<script type="application/ld+json">'.json_encode($this->toArray(), $this->jsonEncodeOptions | JSON_HEX_TAG | JSON_THROW_ON_ERROR).'</script>';
     }
 
     public function __toString(): string
