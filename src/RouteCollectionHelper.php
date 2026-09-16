@@ -79,6 +79,8 @@ readonly class RouteCollectionHelper
             @[$class, $method] = $controllerMethod;
         }
 
+        $method ??= '__invoke';
+
         if (!$this->isValidControllerClassAndMethod($class, $method)) {
             return [];
         }
@@ -96,10 +98,8 @@ readonly class RouteCollectionHelper
         );
     }
 
-    private function isValidControllerClassAndMethod(string $class, ?string $method): bool
+    private function isValidControllerClassAndMethod(string $class, string $method): bool
     {
-        $method ??= '__invoke';
-
         return class_exists($class) && method_exists($class, $method);
     }
 }
